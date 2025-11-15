@@ -1,0 +1,42 @@
+IdProduto;DescNomeProduto;DescCategoriaProduto
+41;Abertura de Reclamação;Outros
+16;Aplicação em CDB;Investimentos
+32;Aplicação em Cripto;Investimentos
+18;Aplicação em Fundo;Investimentos
+36;Ativação Cartão;Crédito
+33;Atualização Cadastro;Conta Digital
+35;Cancelamento Cartão;Crédito
+27;Compra em Loja Parceira;Serviços Financeiros
+25;Compra Gift Card;Serviços Financeiros
+8;Consulta Extrato;Conta Digital
+38;Consulta Investimentos;Investimentos
+39;Consulta Limite Crédito;Crédito
+15;Consulta Saldo;Conta Digital
+23;Contratação Seguro Celular;Seguros
+22;Contratação Seguro Vida;Seguros
+31;Conversão Pontos;Benefícios
+13;Depósito via Boleto;Conta Digital
+12;Depósito via PIX;Conta Digital
+28;Doação via App;Serviços Financeiros
+4;Pagamento Boleto;Pagamentos
+26;Pagamento com Carteira Digital;Serviços Financeiros
+10;Pagamento Empréstimo;Crédito
+1;Pagamento Fatura Cartão;Crédito
+7;Pagamento QR Code;Pagamentos
+11;PIX Enviado;Pagamentos
+5;PIX Recebido;Pagamentos
+29;Recebimento Cashback;Benefícios
+24;Renovação Seguro;Seguros
+40;Resgate de CDB;Investimentos
+21;Resgate de Cripto;Investimentos
+19;Resgate de Fundo;Investimentos
+14;Resgate de Saldo;Conta Digital
+2;Saque com Cartão;Conta Digital
+37;Simulação Empréstimo;Crédito
+20;Solicitação Aumento Limite;Crédito
+34;Solicitação Cartão Virtual;Crédito
+9;Solicitação Empréstimo;Crédito
+17;Solicitação Suporte;Outros
+3;Transferência Bancária;Pagamentos
+6;Uso Cartão de Crédito;Crédito
+30;Utilização Cashback;Benefícios
