@@ -1,4 +1,6 @@
-Projeto SQL — Construindo um Perfil Comportamental de Clientes (Fintech) com SQL
+<img width="1100" height="619" alt="image" src="https://github.com/user-attachments/assets/666853de-a4d8-449a-88b4-2787ca6c6aa6" />Projeto SQL — Construindo um Perfil Comportamental de Clientes (Fintech) com SQL
+
+<img width="1100" height="619" alt="image" src="https://github.com/user-attachments/assets/c29aeedd-2f22-4f09-b105-affa539c65e0" />
 
 Este repositório contém o código SQL e base de dados utilizado para analisar o comportamento dos clientes ao longo do tempo, aplicando janelas temporais (D7, D15, D30, D60) e métricas que ajudam a identificar padrões de uso, sinais de queda de engajamento, riscos potenciais de churn, rastreamento de produtos e janelas de maior atividade.
 Criar uma análise organizada e modular em SQL para explorar o comportamento do cliente ao longo de toda sua jornada.
