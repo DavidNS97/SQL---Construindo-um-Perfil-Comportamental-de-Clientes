@@ -226,7 +226,7 @@ tb_cliente_produto AS (
   <em>Figura 5 – Output da consulta  CTE 5: tb_cliente_produto</em>
 </p>
   
-#### Benefícios analíticos:
+#### Valor Gerado pela Consulta:
 
 - Recomendação personalizada de produtos com base em uso recente;
 - Detectar migrações de comportamento (“parou de usar produto X e passou a usar Y”);
@@ -269,16 +269,240 @@ tb_rn_cliente_produto AS (
   <em>Figura 6 – Output da consulta CTE 6: tb_rn_cliente_produto </em>
 </p>
 
-#### Benefícios analíticos:
+#### Valor Gerado pela Consulta:
 
 Complementando os benefícios da etapa anterior agora é possível facilmente através de filtros identificar o produto favorito por cliente e em diferentes janelas de tempo.
 
+## 7. Dia da semana mais ativo
 
+Criei a CTE `tb_cliente_dia` na qual mostra a quantidade de transação por dia da semana de cada cliente, considerando somente os últimos 60 dias
 
-  
+### Funções utilizadas:
 
+- `CASE + strftime(‘%w’)` → converte a data da transação em um código numérico de dia da semana (0 a 6) e associa para o nome correspondente (“Segunda”, “Terça”…);
+- `COUNT()` → contabiliza quantas transações o cliente realizou em cada dia da semana;
+- `GROUP BY` → agrupa o resultado por cliente e por dia da semana, garantindo uma linha para cada combinação IdCliente + dia_semana;
+- `WHERE` → Garante que as transações do cliente esteja dentro da janela dos ultimos 60 dias.
 
+```sql
+-- ======================================================
+-- CTE 7: Análise por dia da semana (últimos 60 dias)
+-- ======================================================
+tb_cliente_dia AS (
+    SELECT  
+        IdCliente,
 
+        CASE strftime('%w', dt_criacao)
+            WHEN '0' THEN 'Domingo'
+            WHEN '1' THEN 'Segunda-feira'
+            WHEN '2' THEN 'Terça-feira'
+            WHEN '3' THEN 'Quarta-feira'
+            WHEN '4' THEN 'Quinta-feira'
+            WHEN '5' THEN 'Sexta-feira'
+            WHEN '6' THEN 'Sábado'
+        END AS dia_semana,
+
+        COUNT(IdTransacao) AS qtd_transacao
+
+    FROM tb_transacao
+    WHERE dif_date <= 60
+    GROUP BY IdCliente, dia_semana
+),
+```
+
+## 8.Ranking do dia da semana mais ativo
+
+Após identificar quantas transações cada cliente realizou em cada dia da semana na etapa anterior - CTE `tb_cliente_dia` - , avançamos para entender qual dia realmente se destaca para cada usuário.
+
+CTE `tb_cliente_dia_rn` → cria um ranking para determinar o dia da semana mais ativo de cada cliente dentro dos últimos 60 dias.
+
+Usei novamente *Window function* com a logica exatamente a mesma que na etapa 6:
+
+`ROW_NUMBER() OVER (PARTITION BY IdCliente ORDER BY qtd_transacao DESC)` para ordenar os dias da semana pela quantidade de transações e atribui um ranking, onde rn_dia = 1 identifica o dia mais movimentado do cliente.
+
+```sql
+
+-- ======================================================
+-- CTE 8: Ranking do dia da semana mais ativo
+-- ======================================================
+tb_cliente_dia_rn AS (
+    SELECT 
+        *,
+        ROW_NUMBER() OVER (PARTITION BY IdCliente ORDER BY qtd_transacao DESC) AS rn_dia
+    FROM tb_cliente_dia
+),
+```
+<p align="center">
+  <img src="docs/output6.png" alt="CTE 8" width="600"/>
+  <br/>
+  <em>Figura 7 – Output da consulta  CTE 8: tb_cliente_dia_rn </em>
+</p>
+
+#### Valor Gerado pela Consulta:
+
+Essa consulta ajuda a fintech entender o picos de dias de uso que possibilita:
+
+- Planejamento mais inteligente de campanhas e promoções direcionando ofertas exatamente no momento mais engajado de cada cliente;
+- Otimização da disponibilidade e capacidade das equipes possibilitando ajustarem escalas e recursos para dias mais ativos;
+- Melhor programação de rotinas de manutenção — Identificar períodos de menor atividade para reduzir o impacto de atualizações, janelas de manutenção de infraestrutura.
+
+## 9.Período do dia mais ativo
+
+Semelhante ao anterior, mas agora não avaliar o engajamento por dia mas o período do dia em que o cliente é mais ativo:
+
+```sql
+-- ======================================================
+-- CTE 9: Uso por período do dia (manhã/tarde/noite/madrugada) -últimos 60 dias
+-- ======================================================
+tb_cliente_periodo_dia AS (
+    SELECT 
+        IdCliente,
+
+        CASE 
+            WHEN hora BETWEEN  7 AND 12 THEN 'MANHA'
+            WHEN hora BETWEEN 13 AND 18 THEN 'TARDE'
+            WHEN hora BETWEEN 19 AND 23 THEN 'NOITE'
+            ELSE 'MADRUGADA'
+        END AS periodo_dia,
+
+        COUNT(IdTransacao) AS qtd_transacao
+
+    FROM tb_transacao
+    WHERE dif_date <= 60
+    GROUP BY IdCliente, periodo_dia
+),
+
+-- ======================================================
+-- CTE 10: Ranking do período do dia mais ativo
+-- ======================================================
+tb_cliente_periodo_dia_rn AS (
+    SELECT 
+        *,
+        ROW_NUMBER() OVER (PARTITION BY IdCliente ORDER BY qtd_transacao DESC) AS rn_periodo_dia
+    FROM tb_cliente_periodo_dia
+)
+```
+<p align="center">
+  <img src="docs/output7.png" alt="CTE 10" width="600"/>
+  <br/>
+  <em>Figura 8 – Output da consulta  CTE 10: tb_cliente_periodo_dia_rn </em>
+</p>
+
+Essa visão complementa os insights anteriores e acrescenta um nível de granularidade que permite decisões ainda mais precisas por período do dia
+
+## 10.Tabela final: O Perfil Comportamental do Cliente
+
+Nessa última etapa eu realizei a junção de todas as CTEs em um único SELECT final.
+
+Essa tabela reúne, para cada cliente:
+
+- Quantidade de transações por janela
+- Dias desde a última transação
+- Engajamento
+- Idade na base
+- Produto favorito por janela
+- Dia da semana mais ativo
+- Período do dia mais ativo
+- Funções e técnicas utilizadas:
+
+`LEFT JOIN` → combina os dados das CTEs mantendo todos os clientes da base principal (`tb_sumario_transacao`).
+Isso garante que mesmo clientes com pouca atividade não sejam excluídos da análise.
+`JOIN` com condição adicional (`AND tX.rn_ = 1`)
+→ usado para trazer apenas o melhor produto ou o período/dia mais ativo por cliente.
+Em vez de trazer todos os rankings, o JOIN filtra diretamente a linha que representa a posição nº 1 no ranking que é o interesse da análise
+`COALESCE()` → substitui valores nulos por “SEM INFORMAÇÃO” nos campos de dia e período mais ativos.
+Isso é útil quando o cliente não teve atividade nos últimos 60 dias, evitando campos vazios e deixando a tabela mais amigável para leitura
+
+```sql
+-- ======================================================
+-- RESULTADO FINAL: Tabela única consolidada de perfil comportamental
+-- ======================================================
+SELECT 
+    t1.*,
+    t2.Idade_Base,
+    t2.qtdePontos,
+
+    -- Produto mais utilizado por janela
+    t3.DescNomeProduto AS produtovida,
+    t4.DescNomeProduto AS produto60,
+    t5.DescNomeProduto AS produto30,
+    t6.DescNomeProduto AS produto15,
+    t7.DescNomeProduto AS produto7,
+
+    -- Dia e período mais ativos
+    COALESCE(t8.dia_semana,  'SEM INFORMAÇÃO') AS dia_mais_ativo_60dias,
+    COALESCE(t9.periodo_dia, 'SEM INFORMAÇÃO') AS periodo_dia_ativo_60dias
+
+FROM tb_sumario_transacao AS t1
+
+LEFT JOIN tb_clientes AS t2
+    ON t1.IdCliente = t2.IdCliente
+
+LEFT JOIN tb_rn_cliente_produto AS t3
+    ON t1.IdCliente = t3.IdCliente AND t3.rn_vida = 1
+
+LEFT JOIN tb_rn_cliente_produto AS t4
+    ON t1.IdCliente = t4.IdCliente AND t4.rn_60 = 1
+
+LEFT JOIN tb_rn_cliente_produto AS t5
+    ON t1.IdCliente = t5.IdCliente AND t5.rn_30 = 1
+
+LEFT JOIN tb_rn_cliente_produto AS t6
+    ON t1.IdCliente = t6.IdCliente AND t6.rn_15 = 1
+
+LEFT JOIN tb_rn_cliente_produto AS t7
+    ON t1.IdCliente = t7.IdCliente AND t7.rn_7 = 1
+
+LEFT JOIN tb_cliente_dia_rn AS t8
+    ON t1.IdCliente = t8.IdCliente AND t8.rn_dia = 1
+
+LEFT JOIN tb_cliente_periodo_dia_rn AS t9
+    ONt1.IdCliente = t9.IdCliente AND t9.rn_periodo_dia =  1 ;
+```
+<p align="center">
+  <img src="docs/output8.png" alt="Select final" width="600"/>
+  <br/>
+  <em>Figura 9 – Output select final: parte 1</em>
+</p>
+
+<p align="center">
+  <img src="docs/output9.png" alt="Select final" width="600"/>
+  <br/>
+  <em>Figura 10 – Output select final: parte 2</em>
+</p>
+
+## Insights Gerados e Exemplos de Uso
+
+Com essa tabela única, uma fintech pode criar dashboards e análises estatísticas para:
+
+1. **Produto mais utilizado (lifetime e janelas recentes)**  
+   *Uso:* Personalizar ofertas, entender mudança de hábitos e direcionar campanhas de *cross-sell*. Também é possível criar sistemas de recomendação de produtos de acordo com afinidade.
+
+2. **Engajamento histórico vs. últimos 30 dias**  
+   *Uso:* Detectar queda de atividade, priorizar ações de retenção e prever risco de *churn*.
+
+3. **Dias desde a última transação / Transações por janela (D60, D30, D15, D7)**  
+   *Uso:* Criar alertas automáticos para clientes inativos e acionar comunicações de reativação. Permite clusterizar clientes em *heavy users* e usuários sazonais, ajustando limites, cashback e benefícios.
+
+4. **Dia da semana mais ativo**  
+   *Uso:* Enviar notificações no dia com maior probabilidade de engajamento e planejar capacidade operacional.
+
+5. **Período do dia mais ativo**  
+   *Uso:* Disparar mensagens no horário ideal e otimizar atendimento em tempo real.
+## Conclusão
+
+Esse projeto reforça como o SQL é uma das principais ferramentas para o analista de dados. Mesmo partindo de um conjunto simples de tabelas, é possível transformar dados brutos em insights estratégicos que ajudam negócios a tomarem decisões estratégicas.  
+A construção dessa visão única foi fortemente baseada no uso de CTEs (Common Table Expressions), que se mostraram essenciais para organizar o raciocínio, dividir o problema em etapas menores e manter o código limpo. Hoje, o uso de CTEs já faz parte da minha rotina de desenvolvimento.  
+Outro ponto fundamental foi o uso de Window Functions, que permitem cálculos avançados — nesse caso aplicado para ranking — sem perder granularidade por cliente.  
+No fim, esse exercício mostra principalmente que com domínio das ferramentas certas, é possível extrair valor real mesmo de bases pequenas e transformar simples registros de transações em conhecimento acionável para o negócio.  
+
+E isso é tudo por hoje! Espero que gostem deste projeto e que apreciem as informações que encontrarem após a leitura.  
+Para qualquer contato ou troca de ideias, você pode me encontrar no [LinkedIn]([https://www.linkedin.com/in/seu-usuario](https://www.linkedin.com/in/davidnunes9/)).
+
+## Recomendações de Aprendizado
+
+Para quem deseja se aprofundar ainda mais em SQL, análise de dados e boas práticas de desenvolvimento, recomendo acompanhar o perfil de [Teo Calvo](https://www.linkedin.com/in/teocalvo/).  
+Ele compartilha conteúdos valiosos e experiências que podem acelerar o aprendizado e trazer novas perspectivas para quem está começando ou já atua na área.
 
 
 
