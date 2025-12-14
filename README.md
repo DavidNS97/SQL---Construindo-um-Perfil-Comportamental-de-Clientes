@@ -1,22 +1,55 @@
-<img width="1100" height="619" alt="image" src="https://github.com/user-attachments/assets/666853de-a4d8-449a-88b4-2787ca6c6aa6" />Projeto SQL — Construindo um Perfil Comportamental de Clientes (Fintech) com SQL
+# Construindo um Perfil Comportamental de Clientes (Fintech) com SQL
+<p align="left">
+  <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite"/>
+  <img src="https://img.shields.io/badge/status-concluído-brightgreen?style=for-the-badge" alt="Status: Concluído"/>
+</p>
 
-<img width="1100" height="619" alt="image" src="https://github.com/user-attachments/assets/c29aeedd-2f22-4f09-b105-affa539c65e0" />
+## Contexto e explicação do problema
 
-Este repositório contém o código SQL e base de dados utilizado para analisar o comportamento dos clientes ao longo do tempo, aplicando janelas temporais (D7, D15, D30, D60) e métricas que ajudam a identificar padrões de uso, sinais de queda de engajamento, riscos potenciais de churn, rastreamento de produtos e janelas de maior atividade.
-Criar uma análise organizada e modular em SQL para explorar o comportamento do cliente ao longo de toda sua jornada.
-A estrutura foi construída com CTEs a fim de deixar o fluxo de preparação, limpeza, enriquecimento e cálculo de métricas mais claro e sustentável
-O que a análise entrega:
- Atividade histórica completa (lifetime)
-Engajamento por períodos recentes (D60, D30, D15, D7)
-“Dias desde a última transação” — variavel indpependete  de risco de churn
-Produto mais utilizado por cliente em toda a vida e por janelas de tempo
-Tabelas pronta para dashboards, modelos estatísticos e aplicação  machine learning 
+Nos últimos meses tenho me dedicado com mais profundidade ao estudo de **SQL**, principalmente ao uso de **CTEs** e **Window Functions** para análises mais estruturadas e de melhor desempenho.
 
-Tecnologias & Conceitos Utilizados
-SQL (SQLite)
-CTEs (Common Table Expressions)
-Funções de data (julianday, substr)
-Window Functions (ROW_NUMBER())
-Feature Engineering para métricas de comportamento
-Limpeza e estruturação de dados
-Explicação Completa no Medium:  https://medium.com/@davidns97/construindo-um-perfil-comportamental-de-clientes-fintech-com-sql-9eb98d50123b
+Para este projeto escolhi o mercado de **fintech**, uma empresa que oferece diversos serviços financeiros por aplicativo. Mesmo não trabalhando nesse ramo, é um setor com o qual interajo diariamente como consumidor. E justamente por isso tive a ideia de explorar esse tipo de mercado com um olhar analítico, aplicando SQL para entender como os usuários se comportam dentro de uma plataforma financeira.
+
+### 🔎 Perguntas de negócio analisadas
+- Transações históricas (vida, D7, D15, D30, D60)  
+- Dias desde a última transação  
+- Engajamento dos últimos 30 dias versus histórico  
+- Idade na base  
+- Produto mais usado (em diferentes janelas de tempo)  
+- Saldo de pontos atuais  
+- Dia da semana mais ativos (nos últimos 60 dias)  
+- Período do dia mais ativo (nos últimos 60 dias)  
+
+A partir dessas informações, construí em uma única **view** a tabela com o perfil comportamental dos usuários, utilizando **SQLite** como banco local e desenvolvendo toda a lógica dentro do **VS Code**.
+
+Esse trabalho permite identificar padrões de uso, sinais de queda de engajamento, riscos potenciais de churn, rastreamento de produtos e janelas de maior atividade.  
+Essa tabela pode direcionar áreas de **CRM, produto e marketing** para tomar decisões mais assertivas.
+
+## Estrutura das tabelas
+
+Para responder às perguntas de negócio, foram fornecidas **4 tabelas** principais:
+
+### 1. `clientes`
+Reúne informações cadastrais básicas do usuário:
+- `idCliente` → identificador único do cliente  
+- `qtdePontos` → saldo atual de pontos  
+- `DtCriacao` → data de entrada na base (usada para calcular idade na base)  
+
+### 2. `produtos`
+Tabela de referência com o catálogo de produtos disponíveis:
+- `IdProduto` → chave do produto  
+- `DescNomeProduto` → nome do produto  
+- `DescCategoriaProduto` → categoria do produto  
+
+### 3. `transacoes`
+Contém o histórico completo de transações realizadas pelos usuários:
+- `IdTransacao` → identificador da transação  
+- `IdCliente` → chave para o cliente  
+- `DtCriacao` → data da transação  
+
+### 4. `transacao_produto`
+Faz a ponte entre transações e produtos utilizados:
+- `idTransacaoProduto` → identificador do registro  
+- `IdTransacao` → vínculo com a transação  
+- `IdProduto` → vínculo com o produto
+
