@@ -8,9 +8,12 @@
 
 Nos últimos meses tenho me dedicado com mais profundidade ao estudo de **SQL**, principalmente ao uso de **CTEs** e **Window Functions** para análises mais estruturadas e de melhor desempenho.
 
-Para este projeto escolhi o mercado de **fintech**, uma empresa que oferece diversos serviços financeiros por aplicativo. Mesmo não trabalhando nesse ramo, é um setor com o qual interajo diariamente como consumidor. E justamente por isso tive a ideia de explorar esse tipo de mercado com um olhar analítico, aplicando SQL para entender como os usuários se comportam dentro de uma plataforma financeira.
+Para este projeto escolhi o mercado de **fintech**, um setor que oferece diversos serviços financeiros por aplicativo. Embora eu não atue profissionalmente nessa área, é um mercado com o qual interajo diariamente como consumidor. Justamente por isso surgiu a ideia de explorá-lo com um olhar analítico, aplicando SQL para compreender como os usuários se comportam dentro de uma plataforma financeira.
 
-### 🔎 Perguntas de negócio analisadas
+O objetivo deste trabalho **não** é gerar gráficos ou realizar análises estatísticas.  
+A proposta central é **construir uma view única** que concentre as principais métricas de comportamento dos clientes, servindo como base para que áreas de negócio — como **CRM, produto e marketing** — possam tomar decisões mais assertivas e embasadas em dados.
+
+### 🔎 Métricas comportamentais definidas
 - Transações históricas (vida, D7, D15, D30, D60)  
 - Dias desde a última transação  
 - Engajamento dos últimos 30 dias versus histórico  
@@ -20,10 +23,8 @@ Para este projeto escolhi o mercado de **fintech**, uma empresa que oferece dive
 - Dia da semana mais ativos (nos últimos 60 dias)  
 - Período do dia mais ativo (nos últimos 60 dias)  
 
-A partir dessas informações, construí em uma única **view** a tabela com o perfil comportamental dos usuários, utilizando **SQLite** como banco local e desenvolvendo toda a lógica dentro do **VS Code**.
-
-Esse trabalho permite identificar padrões de uso, sinais de queda de engajamento, riscos potenciais de churn, rastreamento de produtos e janelas de maior atividade.  
-Essa tabela pode direcionar áreas de **CRM, produto e marketing** para tomar decisões mais assertivas.
+Utilizei pra esse projeto **SQLite** como banco local e desenvolvendo toda a lógica dentro do **VS Code**.
+Essa view  permite as áreas de negócio identificar padrões de uso, sinais de queda de engajamento, riscos potenciais de churn, rastreamento de produtos e janelas de maior atividade.  
 
 ## Estrutura das tabelas
 
@@ -50,6 +51,11 @@ Contém o histórico completo de transações realizadas pelos usuários:
 ### 4. `transacao_produto`
 Faz a ponte entre transações e produtos utilizados:
 - `idTransacaoProduto` → identificador do registro  
-- `IdTransacao` → vínculo com a transação  
+- `IdTransacao` → vínculo com a transação
 - `IdProduto` → vínculo com o produto
-
+  
+<p align="center">
+  <img src="docs/esquema.png" alt="Esquema das tabelas" width="600"/>
+  <br/>
+  <em>Figura 1 – Esquema das tabelas utilizadas no projeto</em>
+</p>
