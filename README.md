@@ -499,6 +499,21 @@ No fim, esse exercício mostra principalmente que com domínio das ferramentas c
 E isso é tudo por hoje! Espero que gostem deste projeto e que apreciem as informações que encontrarem após a leitura.  
 Para qualquer contato ou troca de ideias, você pode me encontrar no [LinkedIn]([https://www.linkedin.com/in/seu-usuario](https://www.linkedin.com/in/davidnunes9/)).
 
+## Tecnologias utilizadas
+- VS Code  
+- Extensões: SQLite e SQLite3 Editor  
+- Linguagem: SQL
+  
+## Arquivos do projeto
+- Banco de dados: `database.db`  
+- Código principal: `projeto.sql`  
+
+## Como reproduzir o projeto
+- Clonar o repositório  
+- Abrir no VS Code com as extensões instaladas  
+- Garantir que o arquivo `database.db` esteja na raiz  
+- Executar as queries do `projeto.sql` sobre o banco  
+- Explorar os resultados ou conectar a uma ferramenta de BI  
 ## Recomendações de Aprendizado
 
 Para quem deseja se aprofundar ainda mais em SQL, análise de dados e boas práticas de desenvolvimento, recomendo acompanhar o perfil de [Teo Calvo](https://www.linkedin.com/in/teocalvo/).  
