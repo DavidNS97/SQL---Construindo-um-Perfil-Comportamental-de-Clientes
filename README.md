@@ -515,10 +515,6 @@ Para qualquer contato ou troca de ideias, você pode me encontrar no [LinkedIn](
 - Garantir que o arquivo `database.db` esteja na raiz  
 - Executar as queries do `projeto.sql` sobre o banco  
 - Explorar os resultados ou conectar a uma ferramenta de BI  
-## Recomendações de Aprendizado
-
-Para quem deseja se aprofundar ainda mais em SQL, análise de dados e boas práticas de desenvolvimento, recomendo acompanhar o perfil de [Teo Calvo](https://www.linkedin.com/in/teocalvo/).  
-Ele compartilha conteúdos valiosos e experiências que podem acelerar o aprendizado e trazer novas perspectivas para quem está começando ou já atua na área.
 
 
 
